@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import './App.css';
 import Dashboard from './components/Dashboard';
 import Display from './components/Display';
@@ -8,38 +8,64 @@ const App = () => {
   const [atBat, setAtBat] = useState({
     player: 1,
     strike: 0,
-    ball: 0
+    ball: 0,
+    out: 0,
+    totalOut: 0,
+    inning: `1A`
   });
 
-  if (atBat.strike === 3 || atBat.ball === 4) {
 
-    setAtBat({
-      player: atBat.player += 1,
-      strike: 0,
-      ball: 0
-    })
-  }
-  
-  // balls and strikes reset to 0 when a hit is recorded
-  let hit = false;
+  let num = Math.floor(atBat.totalOut/3);
+  console.log('num',num);
+  console.log('Total Out',atBat.totalOut);
 
-  if (hit) {
-    setAtBat({
-      player: atBat.player += 1,
-      strike: 0,
-      ball: 0
-    })
-  }
-  // a foul increases strikes up to 2. With no strikes, a foul makes it 1 strike. With 1 strike, a foul makes it 2 strikes. With two strikes a foul has no effect, count stays at 2 strikes.
-  let foul = false;
+  useEffect(() => {
 
-  if (foul){
-    if(atBat.strike < 2) {
-      setAtBat({
-        ...atBat,
-        strike: atBat.strike += 1 ,
-      })
+    if(num < 2){
+      if (num == 0) {
+        setAtBat({
+          ...atBat,
+          inning: `1A`
+        })
+      } else if (num == 1) {
+        setAtBat({
+          ...atBat,
+          inning: `1B`
+        })
+      }
+    } else if (num >= 2) {
+      if (num%2 == 0){
+      
+        setAtBat({
+          ...atBat,
+          inning: `${num}A`
+        })
+      } else {
+        setAtBat({
+          ...atBat,
+          inning: `${num}B`
+        })
+      }
     }
+  }, [atBat.totalOut])
+
+  if (atBat.strike === 3) {
+
+    setAtBat({
+      ...atBat,
+      player: atBat.player += 1,
+      strike: 0,
+      ball: 0,
+      out: atBat.out += 1
+    })
+  }
+
+  if (atBat.ball === 4) {
+    setAtBat({
+      player: atBat.player += 1,
+      strike: 0,
+      ball: 0,
+    })
   }
 
 
